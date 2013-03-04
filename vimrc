@@ -1,95 +1,93 @@
-" Use Vim settings, rather than Vi settings (much better!).
-:set nocompatible
-
-" Disable the splash screen
-:set shortmess +=I
-
 " Enable pathogen bundles
 " See http://www.vim.org/scripts/script.php?script_id=2332
 " Put github plugins under .vim/bundle/ -- which allows keeping them updated
 " without having to do separate installation.
 " Call "filetype off" first to ensure that bundle ftplugins can be added to the
 " path before we re-enable it later in the vimrc.
-:filetype off
+filetype off
+
 call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
-
-:set hidden
-
-:set ai                           " set auto-indenting on for programming
-
-:set showcmd                      " display incomplete commnds
-":set list                         " show invisibles
-:set number                       " show line numbers
-:set ruler                        " show the current row and column
-:set hlsearch
-:set cursorline
-
-:set wrap " doesn't appear to be working...
-":set linebreak                   " only wrap on enter
-:set nolist                       " list disables linebreak
-
-" show fold column, fold by marker
-:set foldcolumn=2
-:set foldmethod=marker
-
-" set tabwidth to 4 and use spaces
-:set tabstop=4
-:set shiftwidth=4
-:set softtabstop=4
-:set expandtab
-:set textwidth=0
-:set wrapmargin=0
-:set encoding=utf-8
-
-:set visualbell t_vb=             " turn off error beep/flash
-:set novisualbell                 " turn off visual bell
-
-" fast terminal for smoother rendering
-:set ttyfast
-
-" turn off swap files
-:set noswapfile
-
-" keep a lot of history
-:set history=100
-
-" don't duplicate an existing open buffer
-:set switchbuf=useopen
-
-" Make backspace behave in a sane manner.
-:set backspace=indent,eol,start
-
 call pathogen#infect()
 
+
+" Use Vim settings, rather than Vi settings (much better!).
+set nocompatible
+
+" Disable the splash screen
+set shortmess +=I
+
+set hidden
+
+set noai                         " set auto-indenting on for programming
+
+set showcmd                      " display incomplete commnds
+set list                         " show invisibles
+
+set number                       " show line numbers
+set ruler                        " show the current row and column
+set hlsearch
+set cursorline
+
+set listchars=tab:▸\ ,eol:¬
+
+set wrap " doesn't appear to be working...
+":set linebreak                   " only wrap on enter
+"set nolist                       " list disables linebreak
+
+" show fold column, fold by marker
+set foldcolumn=2
+set foldmethod=marker
+
+" set tabwidth to 4 and use spaces
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+set textwidth=120
+set encoding=utf-8
+
+set visualbell t_vb=             " turn off error beep/flash
+set novisualbell                 " turn off visual bell
+set pastetoggle=<F2>             " toggle 'set paste'
+
+" fast terminal for smoother rendering
+set ttyfast
+
+" turn off swap files
+set noswapfile
+
+" keep a lot of history
+set history=100
+
+" don't duplicate an existing open buffer
+set switchbuf=useopen
+
+" Make backspace behave in a sane manner.
+set backspace=indent,eol,start
+
 " Switch syntax highlighting on
-:syntax on
-":set tags=$HOME/.vim.tags
-":helptags $HOME/.vim.tags
+syntax on
+set tags=$HOME/.vim.tags
+helptags $HOME/.vim.tags
 
 " Load a tag file
 " Loads a tag file from ~/.vim.tags/, based on the argument provided. The
 " command "Ltag"" is mapped to this function.
-:function! LoadTags(file)
-:   let tagspath = $HOME . "/.vim.tags/" . a:file
-:   let tagcommand = 'set tags+=' . tagspath
-:   execute tagcommand
-:endfunction
-:command! -nargs=1 Ltag :call LoadTags("<args>")
-
-" These are tag files I've created; you may want to remove/change these for your
-" own usage.
-":call LoadTags("PEAR")
+function! LoadTags(file)
+   let tagspath = $HOME . "/.vim.tags/" . a:file
+   let tagcommand = 'set tags+=' . tagspath
+   execute tagcommand
+endfunction
+command! -nargs=1 Ltag :call LoadTags("<args>")
 
 " Enable file type detection and do language-dependent indenting.
 filetype plugin indent on
 
-:set mouse=a
+set mouse=a
 " Shortcut to rapidly toggle `set list`
-nmap <leader>l :set list!<CR>
+nmap <leader>l set list!<CR>
 
-" Use the same symbols as TextMate for tabstops and EOLs
-:set listchars=tab:▸\ ,eol:¬
 
 " Set tabstop, softtabstop and shiftwidth to the same value
 command! -nargs=* Stab call Stab()
@@ -119,37 +117,6 @@ function! SummarizeTabs()
   endtry
 endfunction
 
-" Only do this part when compiled with support for autocommands
-if has("autocmd")
-  " Enable file type detection
-  filetype on
-
-  " Syntax of these languages is fussy over tabs Vs spaces
-  autocmd FileType make setlocal ts=8 sts=8 sw=8 noexpandtab
-  autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
-
-  " Customisations based on house-style (arbitrary)
-  "autocmd FileType html setlocal ts=2 sts=2 sw=2 expandtab
-  "autocmd FileType css setlocal ts=2 sts=2 sw=2 expandtab
-  "autocmd FileType javascript setlocal ts=4 sts=4 sw=4 noexpandtab
-
-  " Treat .rss files as XML
-  autocmd BufNewFile,BufRead *.rss,*.atom setfiletype xml
-endif
-
-function! <SID>StripTrailingWhitespaces()
-    " Preparation: save last search, and cursor position.
-    let _s=@/
-    let l = line(".")
-    let c = col(".")
-    " Do the business:
-    %s/\s\+$//e
-    " Clean up: restore previous search history, and cursor position
-    let @/=_s
-    call cursor(l, c)
-endfunction
-
-nnoremap <silent> <F5> :call <SID>StripTrailingWhitespaces()<CR>
 
 "php syntax options {{{
 let php_sql_query = 1 "for SQL syntax highlighting inside strings
@@ -163,7 +130,7 @@ let php_htmlInStrings = 1 "for HTML syntax highlighting inside strings
 let php_folding = 1 "for folding classes and functions
 " }}}
 
-:let tagspath = "~/.vim.tags/"
+let tagspath = "~/.vim.tags/"
 
 " set the names of flags
 let tlist_php_settings = 'php;c:class;f:function;d:constant;p:property'
@@ -179,11 +146,14 @@ let Tlist_Close_On_Select = 1
 let Tlist_Display_Prototype = 1
 " show tags only for current buffer
 let Tlist_Show_One_File = 1
+" call pathogen#infect()
 "}}}
 "{{{html options
 let html_use_css = 1
 "}}}
 
+
+" Strip trailing whitespace for the following file-types.
 autocmd BufWritePre *.py,*.js,*.php,*.html,*.htm :call <SID>StripTrailingWhitespaces()
 
 " phpDocumentor comment block generation
@@ -202,13 +172,13 @@ vnoremap <C-P> :call PhpDocRange()<CR>
 autocmd FileType php set keywordprg=pman
 
 " PHPUnit
-:autocmd FileType php noremap <Leader>u :w!<CR>:!phpunit -d memory-limit=1024M --strict --colors %<CR>
+autocmd FileType php noremap <Leader>u :w!<CR>:!phpunit -d memory-limit=1024M --strict --colors %<CR>
 
 " PHP linter
-:autocmd FileType php noremap <C-L> :w!<CR>:!php -l %<CR>
+autocmd FileType php noremap <C-L> :w!<CR>:!php -l %<CR>
 
 " PHP Coding Standards
-:autocmd FileType php noremap <Leader>s :w!<CR>:!phpcs --standard=Plusnet %<CR>
+autocmd FileType php noremap <Leader>s :w!<CR>:!phpcs --standard=Plusnet %<CR>
 
 function! RunPhpcs()
     let l:filename=@%
@@ -242,9 +212,22 @@ function! NoCp()
 endfunction
 command! NoCp execute NoCp()
 
-color blackboard
-
 imap <silent> <Down> <C-o>gj
 imap <silent> <Up> <C-o>gk
 nmap <silent> <Down> gj
 nmap <silent> <Up> gk
+
+noremap <F3> :call Svndiff("prev")<CR>
+noremap <F4> :call Svndiff("next")<CR>
+noremap <F5> :call Svndiff("clear")<CR>
+
+autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+
+autocmd BufWritePre * :%s/\s\+$//e
+
+augroup filetypedetect
+    au BufNewFile,BufRead *.xt  setf xt
+augroup END
+
+color blackboard
