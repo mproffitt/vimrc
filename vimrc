@@ -31,10 +31,6 @@ set cursorline
 
 set listchars=tab:▸\ ,eol:¬
 
-set wrap " doesn't appear to be working...
-":set linebreak                   " only wrap on enter
-"set nolist                       " list disables linebreak
-
 " show fold column, fold by marker
 set foldcolumn=2
 set foldmethod=marker
@@ -44,9 +40,10 @@ set tabstop=4
 set shiftwidth=4
 set softtabstop=4
 set expandtab
-set textwidth=120
 set encoding=utf-8
 
+setlocal autoindent
+setlocal smartindent
 set visualbell t_vb=             " turn off error beep/flash
 set novisualbell                 " turn off visual bell
 set pastetoggle=<F2>             " toggle 'set paste'
@@ -86,7 +83,7 @@ filetype plugin indent on
 
 set mouse=a
 " Shortcut to rapidly toggle `set list`
-nmap <leader>l set list!<CR>
+nmap <leader>l :set list!<CR>
 
 
 " Set tabstop, softtabstop and shiftwidth to the same value
@@ -152,21 +149,17 @@ let Tlist_Show_One_File = 1
 let html_use_css = 1
 "}}}
 
-
-" Strip trailing whitespace for the following file-types.
-autocmd BufWritePre *.py,*.js,*.php,*.html,*.htm :call <SID>StripTrailingWhitespaces()
-
 " phpDocumentor comment block generation
 inoremap <C-P> <ESC>:call PhpDocSingle()<CR>i
 nnoremap <C-P> :call PhpDocSingle()<CR>
 vnoremap <C-P> :call PhpDocRange()<CR>
 
 " Run PHP linter on write
-"augroup php
-"  au BufNewFile,BufRead *.inc,*.php,*.html,*.ihtml,*.php3 set efm=%E,%C%m\ in\ %f\ on\ line\ %l,%CErrors\ parsing\ %f,%C,%Z
-"  au BufNewFile,BufRead *.inc,*.php,*.html,*.ihtml,*.php3 set makeprg=php\ -ddisplay_errors=on\ -l\ %
-"  au BufWritePost *.inc,*.php,*.html,*.ihtml,*.php3 :make
-"augroup END
+augroup php
+  au BufNewFile,BufRead *.inc,*.php,*.html,*.ihtml,*.php3 set efm=%E,%C%m\ in\ %f\ on\ line\ %l,%CErrors\ parsing\ %f,%C,%Z
+  au BufNewFile,BufRead *.inc,*.php,*.html,*.ihtml,*.php3 set makeprg=php\ -ddisplay_errors=on\ -l\ %
+  au BufWritePost *.inc,*.php,*.html,*.ihtml,*.php3 :make
+augroup END
 
 " PHP Manual
 autocmd FileType php set keywordprg=pman
@@ -212,6 +205,26 @@ function! NoCp()
 endfunction
 command! NoCp execute NoCp()
 
+" Switches on Book mode. Changes text width from 120 to 80 cols
+function! Book()
+    let g:BOOK=0
+    setlocal spell spelllang=en_gb
+    set colorcolumn=81
+    set textwidth=80
+    set nolist
+endfunction
+command! Book execute Book()
+
+" Disables book mode.
+function! NoBook()
+    set nospell
+    set colorcolumn=120
+    set textwidth=0
+    unlet g:BOOK
+endfunction
+command! NoBook execute NoBook()
+
+
 imap <silent> <Down> <C-o>gj
 imap <silent> <Up> <C-o>gk
 nmap <silent> <Down> gj
@@ -231,3 +244,74 @@ augroup filetypedetect
 augroup END
 
 color blackboard
+set colorcolumn=120
+
+" Function to set vim tab title
+"
+" This function will set the tab title as:
+"     <TAB_NUM> <FILENAME>
+"
+" example:
+"     1 vimrc | 2 satis.json | 3 [B] book.tex
+if exists("+showtabline")
+    function TabLine()
+        let s = ''
+        for t in range(tabpagenr('$'))
+            if t + 1 == tabpagenr()
+                let s .= '%#TabLineSel#'
+            else
+                let s .= '%#TabLine#'
+            endif
+            let s .= ' '
+            let s .= '%' . (t + 1) . 'T'
+            let s .= t + 1 . ' '
+            let n = ''
+            let m = 0
+            let bc = len(tabpagebuflist(t + 1))
+            for b in tabpagebuflist(t + 1)
+                if getbufvar( b, "&buftype" ) == 'help'
+                    let n .= '[H]' . fnamemodify( bufname(b), ':t:s/.txt$//' )
+                elseif getbufvar( b, "&buftype" ) == 'quickfix'
+                    let n .= '[Q]'
+                elseif exists('g:BOOK')
+                    let n .= '[B] ' . fnamemodify(bufname(b), ':t')
+                else
+                    let n .= fnamemodify(bufname(b), ':t')
+                endif
+
+                if getbufvar( b, "&modified" )
+                    let m += 1
+                endif
+
+                if bc > 1
+                    let n .= ' '
+                endif
+                let bc -= 1
+            endfor
+
+            if m > 0
+                let s.= '+ '
+            endif
+
+            if n == ''
+                let s .= '[No Name]'
+            else
+                let s .= n
+            endif
+
+            let s .= ' '
+        endfor
+
+        let s .= '%#TabLineFill#%T'
+
+        if tabpagenr('$') > 1
+            let s .= '%=%#TabLine#%999XX'
+        endif
+
+        return s
+    endfunction
+
+    set stal=2
+    set tabline=%!TabLine()
+endif
+

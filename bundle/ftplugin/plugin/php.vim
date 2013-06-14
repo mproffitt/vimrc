@@ -7,22 +7,6 @@ source ~/.vim/php-doc.vim
 let PHP_autoformatcomment = 1
 
 " {{{ Settings
-
-" Auto expand tabs to spaces
-setlocal expandtab
-
-" Auto indent after a {
-setlocal autoindent
-setlocal smartindent
-
-" Linewidth to 79, because of the formatoptions this is only valid for
-" comments
-setlocal textwidth=79
-setlocal formatoptions=qrocb
-
-" Do not wrap lines automatically
-setlocal nowrap
-
 " Correct indentation after opening a phpdocblock and automatic * on every
 " line
 setlocal formatoptions=qroct
@@ -94,7 +78,7 @@ vnoremap <buffer> <C-c> :call PhpUnComment()<CR>
 "inoremap <buffer> ( ()<LEFT>
 
 " Maybe this way in other coding standards
-" inoremap ( ( )<LEFT><LEFT> 
+" inoremap ( ( )<LEFT><LEFT>
 
 "inoremap <buffer> " ""<LEFT>
 "inoremap <buffer> ' ''<LEFT>
@@ -156,15 +140,15 @@ func! PhpAlign() range
 			continue
 		endif
 		" \{-\} matches ungreed *
-        let l:index = substitute (getline (l:line), '^\s*\(.\{-\}\)\s*\S\{0,1}=\S\{0,1\}\s.*$', '\1', "") 
+        let l:index = substitute (getline (l:line), '^\s*\(.\{-\}\)\s*\S\{0,1}=\S\{0,1\}\s.*$', '\1', "")
         let l:indexlength = strlen (l:index)
         let l:maxlength = l:indexlength > l:maxlength ? l:indexlength : l:maxlength
         let l:line = l:line + 1
     endwhile
-    
+
 	let l:line = a:firstline
 	let l:format = "%s%-" . l:maxlength . "s %s %s"
-    
+
 	while l:line <= l:endline
 		if getline (l:line) =~ '^\s*\/\/.*$'
 			let l:line = l:line + 1
@@ -182,7 +166,7 @@ func! PhpAlign() range
     let &g:paste = l:paste
 endfunc
 
-" }}}   
+" }}}
 
 " {{{ (Un-)comment
 
