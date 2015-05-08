@@ -5,11 +5,21 @@
 " Call "filetype off" first to ensure that bundle ftplugins can be added to the
 " path before we re-enable it later in the vimrc.
 filetype off
+filetype plugin indent off
+
+" set runtimepath+=/usr/local/Cellar/go/1.2.1/libexec/misc/vim
+
+
+" open files in tabs
+"au BufAdd,BufNewFile,BufRead * nested tab sball
+
+set rtp+=$HOME/.local/pythis2.7/site-packages/powerline/bindings/vim/
+set laststatus=2
+set t_Co=256
 
 call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 call pathogen#infect()
-
 
 " Use Vim settings, rather than Vi settings (much better!).
 set nocompatible
@@ -205,26 +215,6 @@ function! NoCp()
 endfunction
 command! NoCp execute NoCp()
 
-" Switches on Book mode. Changes text width from 120 to 80 cols
-function! Book()
-    let g:BOOK=0
-    setlocal spell spelllang=en_gb
-    set colorcolumn=81
-    set textwidth=80
-    set nolist
-endfunction
-command! Book execute Book()
-
-" Disables book mode.
-function! NoBook()
-    set nospell
-    set colorcolumn=120
-    set textwidth=0
-    unlet g:BOOK
-endfunction
-command! NoBook execute NoBook()
-
-
 imap <silent> <Down> <C-o>gj
 imap <silent> <Up> <C-o>gk
 nmap <silent> <Down> gj
@@ -239,6 +229,8 @@ autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 
 autocmd BufWritePre * :%s/\s\+$//e
 
+command W w !sudo tee % > /dev/null
+
 augroup filetypedetect
     au BufNewFile,BufRead *.xt  setf xt
 augroup END
@@ -246,72 +238,7 @@ augroup END
 color blackboard
 set colorcolumn=120
 
-" Function to set vim tab title
-"
-" This function will set the tab title as:
-"     <TAB_NUM> <FILENAME>
-"
-" example:
-"     1 vimrc | 2 satis.json | 3 [B] book.tex
-if exists("+showtabline")
-    function TabLine()
-        let s = ''
-        for t in range(tabpagenr('$'))
-            if t + 1 == tabpagenr()
-                let s .= '%#TabLineSel#'
-            else
-                let s .= '%#TabLine#'
-            endif
-            let s .= ' '
-            let s .= '%' . (t + 1) . 'T'
-            let s .= t + 1 . ' '
-            let n = ''
-            let m = 0
-            let bc = len(tabpagebuflist(t + 1))
-            for b in tabpagebuflist(t + 1)
-                if getbufvar( b, "&buftype" ) == 'help'
-                    let n .= '[H]' . fnamemodify( bufname(b), ':t:s/.txt$//' )
-                elseif getbufvar( b, "&buftype" ) == 'quickfix'
-                    let n .= '[Q]'
-                elseif exists('g:BOOK')
-                    let n .= '[B] ' . fnamemodify(bufname(b), ':t')
-                else
-                    let n .= fnamemodify(bufname(b), ':t')
-                endif
+call tabline#setup()
+call bookcommands#setup()
 
-                if getbufvar( b, "&modified" )
-                    let m += 1
-                endif
-
-                if bc > 1
-                    let n .= ' '
-                endif
-                let bc -= 1
-            endfor
-
-            if m > 0
-                let s.= '+ '
-            endif
-
-            if n == ''
-                let s .= '[No Name]'
-            else
-                let s .= n
-            endif
-
-            let s .= ' '
-        endfor
-
-        let s .= '%#TabLineFill#%T'
-
-        if tabpagenr('$') > 1
-            let s .= '%=%#TabLine#%999XX'
-        endif
-
-        return s
-    endfunction
-
-    set stal=2
-    set tabline=%!TabLine()
-endif
-
+noremap <silent> <F9> :cal VimCommanderToggle()<CR>
