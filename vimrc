@@ -7,13 +7,7 @@
 filetype off
 filetype plugin indent off
 
-" set runtimepath+=/usr/local/Cellar/go/1.2.1/libexec/misc/vim
-
-
-" open files in tabs
-"au BufAdd,BufNewFile,BufRead * nested tab sball
-
-set rtp+=$HOME/.local/pythis2.7/site-packages/powerline/bindings/vim/
+set rtp+=$HOME/.local/python2.7/site-packages/powerline/bindings/vim/
 set laststatus=2
 set t_Co=256
 
@@ -170,6 +164,16 @@ augroup php
   au BufNewFile,BufRead *.inc,*.php,*.html,*.ihtml,*.php3 set makeprg=php\ -ddisplay_errors=on\ -l\ %
   au BufWritePost *.inc,*.php,*.html,*.ihtml,*.php3 :make
 augroup END
+au! BufRead,BufNewFile *.json set filetype=json
+augroup json_autocmd
+  autocmd!
+  autocmd FileType json set autoindent
+  autocmd FileType json set formatoptions=tcq2l
+  autocmd FileType json set textwidth=78 shiftwidth=2
+  autocmd FileType json set softtabstop=4 tabstop=4
+  autocmd FileType json set expandtab
+  autocmd FileType json set foldmethod=syntax
+augroup END
 
 " PHP Manual
 autocmd FileType php set keywordprg=pman
@@ -195,6 +199,9 @@ endfunction
 
 set errorformat+=\"%f\"\\,%l\\,%c\\,%t%*[a-zA-Z]\\,\"%m\"
 command! Phpcs execute RunPhpcs()
+
+":cnoreabbrev wq w<bar>tabclose
+":cnoreabbrev q bd<bar>q
 
 autocmd vimenter * if !argc() | NERDTree | endif
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
@@ -242,3 +249,13 @@ call tabline#setup()
 call bookcommands#setup()
 
 noremap <silent> <F9> :cal VimCommanderToggle()<CR>
+
+let NERDTreeIgnore = ['\.pyc$']
+
+set lazyredraw
+set ttyfast
+
+if &term =~ '256color'
+    set t_ut=
+endif
+
