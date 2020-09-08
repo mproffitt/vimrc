@@ -13,23 +13,49 @@ set showtabline=2
 set noshowmode
 set t_Co=256
 
-call pathogen#runtime_append_all_bundles()
-call pathogen#helptags()
-call pathogen#infect()
+call plug#begin('~/.vim/plugged')
+    Plug 'hashivim/vim-terraform'
+    Plug 'vim-syntastic/syntastic'
+    Plug 'juliosueiras/vim-terraform-completion'
+    Plug 'vim-vdebug/vdebug'
+    Plug 'tpope/vim-fugitive'
+    Plug 'preservim/nerdtree'
+    Plug 'Xuyuanp/nerdtree-git-plugin'
+    Plug 'roxma/nvim-yarp'
+    Plug 'roxma/vim-hug-neovim-rpc'
+    Plug 'Shougo/deoplete.nvim'
+    Plug 'ervandew/supertab'
+    Plug 'weierophinney/vimwiki.git'
+    Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
+call plug#end()
+
+" Syntastic Config
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+" Terraform settings
+let g:syntastic_terraform_tffilter_plan = 1
+let g:terraform_completion_keys = 1
+let g:terraform_registry_module_completion = 0
+
+" deoplete config
+let g:deoplete#enable_at_startup = 1
 
 " Use Vim settings, rather than Vi settings (much better!).
 set nocompatible
 
 " Disable the splash screen
 set shortmess +=I
-
 set hidden
-
 set noai                         " set auto-indenting on for programming
-
 set showcmd                      " display incomplete commnds
 set list                         " show invisibles
-
 set number                       " show line numbers
 set ruler                        " show the current row and column
 set hlsearch
@@ -54,16 +80,12 @@ setlocal smartindent
 set visualbell t_vb=             " turn off error beep/flash
 set novisualbell                 " turn off visual bell
 set pastetoggle=<F2>             " toggle 'set paste'
-
 " fast terminal for smoother rendering
 set ttyfast
-
 " turn off swap files
 set noswapfile
-
 " keep a lot of history
 set history=10000
-
 " don't duplicate an existing open buffer
 set switchbuf=useopen
 
@@ -74,6 +96,12 @@ set backspace=indent,eol,start
 syntax on
 set tags=$HOME/.vim.tags
 helptags $HOME/.vim.tags
+
+
+color blackboard
+set colorcolumn=120
+
+highlight Pmenu ctermbg=gray guibg=gray
 
 " Load a tag file
 " Loads a tag file from ~/.vim.tags/, based on the argument provided. The
@@ -197,9 +225,6 @@ command W w !sudo tee % > /dev/null
 augroup filetypedetect
     au BufNewFile,BufRead *.xt  setf xt
 augroup END
-
-color blackboard
-set colorcolumn=120
 
 call tabline#setup()
 call bookcommands#setup()

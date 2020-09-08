@@ -1,21 +1,10 @@
 Installation
 ============
 
-    git clone git://github.com/skl/vimrc.git ~/.vim
-    cd ~/.vim
-    git submodule update --init
-    ln -s ~/.vim/vimrc ~/.vimrc
+Download the repository to `~/.vim`
 
-If you see the following error on vim startup:
+`git clone git@github.com:mproffitt/vimrc ~/.vim`
 
-    Taglist: Exuberant ctags ( http://ctags.sf.net) not found in PATH. Plugin
-    is not loaded. )
+Symlink `~/.vim/vimrc` to `~/.vimrc`
 
-You need to install exuberant-ctags:
-
-    sudo apt-get install exuberant-ctags
-
-You can update all submodules in future by executing the following:
-
-    cd ~/.vim
-    git submodule foreach git pull origin master
+Open vim, then run `:PlugInstall`
