@@ -7,8 +7,10 @@
 filetype off
 filetype plugin indent off
 
-set rtp+=$HOME/.local/python2.7/site-packages/powerline/bindings/vim/
+set rtp+=/usr/local/lib/python3.8/dist-packages/powerline/bindings/vim
 set laststatus=2
+set showtabline=2
+set noshowmode
 set t_Co=256
 
 call pathogen#runtime_append_all_bundles()
@@ -45,6 +47,7 @@ set shiftwidth=4
 set softtabstop=4
 set expandtab
 set encoding=utf-8
+set autoread
 
 setlocal autoindent
 setlocal smartindent
@@ -59,7 +62,7 @@ set ttyfast
 set noswapfile
 
 " keep a lot of history
-set history=100
+set history=10000
 
 " don't duplicate an existing open buffer
 set switchbuf=useopen
@@ -118,23 +121,9 @@ function! SummarizeTabs()
   endtry
 endfunction
 
-
-"php syntax options {{{
-let php_sql_query = 1 "for SQL syntax highlighting inside strings
-let php_htmlInStrings = 1 "for HTML syntax highlighting inside strings
-"php_baselib = 1 "for highlighting baselib functions
-"php_asp_tags = 1 "for highlighting ASP-style short tags
-"php_parent_error_close = 1 "for highlighting parent error ] or )
-"php_parent_error_open = 1 "for skipping an php end tag, if there exists an open ( or [ without a closing one
-"php_oldStyle = 1 "for using old colorstyle
-"php_noShortTags = 1 "don't sync <? ?> as php
-let php_folding = 1 "for folding classes and functions
-" }}}
-
 let tagspath = "~/.vim.tags/"
 
 " set the names of flags
-let tlist_php_settings = 'php;c:class;f:function;d:constant;p:property'
 " close all folds except for current file
 let Tlist_File_Fold_Auto_Close = 1
 " make tlist pane active when opened
@@ -149,21 +138,11 @@ let Tlist_Display_Prototype = 1
 let Tlist_Show_One_File = 1
 " call pathogen#infect()
 "}}}
+"
 "{{{html options
 let html_use_css = 1
 "}}}
 
-" phpDocumentor comment block generation
-inoremap <C-P> <ESC>:call PhpDocSingle()<CR>i
-nnoremap <C-P> :call PhpDocSingle()<CR>
-vnoremap <C-P> :call PhpDocRange()<CR>
-
-" Run PHP linter on write
-augroup php
-  au BufNewFile,BufRead *.inc,*.php,*.html,*.ihtml,*.php3 set efm=%E,%C%m\ in\ %f\ on\ line\ %l,%CErrors\ parsing\ %f,%C,%Z
-  au BufNewFile,BufRead *.inc,*.php,*.html,*.ihtml,*.php3 set makeprg=php\ -ddisplay_errors=on\ -l\ %
-  au BufWritePost *.inc,*.php,*.html,*.ihtml,*.php3 :make
-augroup END
 au! BufRead,BufNewFile *.json set filetype=json
 augroup json_autocmd
   autocmd!
@@ -175,30 +154,7 @@ augroup json_autocmd
   autocmd FileType json set foldmethod=syntax
 augroup END
 
-" PHP Manual
-autocmd FileType php set keywordprg=pman
-
-" PHPUnit
-autocmd FileType php noremap <Leader>u :w!<CR>:!phpunit -d memory-limit=1024M --strict --colors %<CR>
-
-" PHP linter
-autocmd FileType php noremap <C-L> :w!<CR>:!php -l %<CR>
-
-" PHP Coding Standards
-autocmd FileType php noremap <Leader>s :w!<CR>:!phpcs --standard=Plusnet %<CR>
-
-function! RunPhpcs()
-    let l:filename=@%
-    let l:phpcs_output=system('phpcs --report=csv '.l:filename)
-"    echo l:phpcs_output
-    let l:phpcs_list=split(l:phpcs_output, "\n")
-    unlet l:phpcs_list[0]
-    cexpr l:phpcs_list
-    cwindow
-endfunction
-
 set errorformat+=\"%f\"\\,%l\\,%c\\,%t%*[a-zA-Z]\\,\"%m\"
-command! Phpcs execute RunPhpcs()
 
 ":cnoreabbrev wq w<bar>tabclose
 ":cnoreabbrev q bd<bar>q
