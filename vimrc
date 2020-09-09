@@ -11,28 +11,73 @@ set rtp+=/usr/local/lib/python3.8/dist-packages/powerline/bindings/vim
 set laststatus=2
 set showtabline=2
 set noshowmode
+set nocompatible
 set t_Co=256
 
 call plug#begin('~/.vim/plugged')
     Plug 'hashivim/vim-terraform'
+    Plug 'hashivim/vim-consul'
+    Plug 'hashivim/vim-vaultproject'
     Plug 'vim-syntastic/syntastic'
-    Plug 'juliosueiras/vim-terraform-completion'
+    " Plug 'juliosueiras/vim-terraform-completion'
     Plug 'vim-vdebug/vdebug'
     Plug 'tpope/vim-fugitive'
     Plug 'preservim/nerdtree'
     Plug 'Xuyuanp/nerdtree-git-plugin'
     Plug 'roxma/nvim-yarp'
     Plug 'roxma/vim-hug-neovim-rpc'
-    Plug 'Shougo/deoplete.nvim'
-    Plug 'ervandew/supertab'
-    Plug 'weierophinney/vimwiki.git'
+    " Plug 'Shougo/deoplete.nvim'
+    " Plug 'deoplete-plugins/deoplete-jedi'
+    " Plug 'deoplete-plugins/deoplete-go', { 'do': 'make'}
+    " Plug 'ervandew/supertab'
+    Plug 'weierophinney/vimwiki'
     Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
+    Plug 'rhysd/vim-healthcheck'
+    Plug 'lpenz/vimcommander'
+    Plug 'tpope/vim-endwise'
+    Plug 'LucHermitte/lh-vim-lib'
+    Plug 'LucHermitte/lh-brackets'
+
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
 call plug#end()
 
 " Syntastic Config
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
+
+
+"{{{ CoC Configuration
+nmap <silent> <leader>lp <Plug>(coc-diagnostic-prev)
+nmap <silent> <leader>ln <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+nmap <silent> <leader>ld <Plug>(coc-definition)
+nmap <silent> <leader>lt <Plug>(coc-type-definition)
+nmap <silent> <leader>li <Plug>(coc-implementation)
+nmap <silent> <leader>lf <Plug>(coc-references)
+
+" Remap for rename current word
+nmap <leader>lr <Plug>(coc-rename)
+
+" Use K for show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+inoremap <silent><expr> <c-@> coc#refresh()
+
+function! s:show_documentation()
+  if &filetype == 'vim'
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+"}}}
+
+let b:usemarks         = 0
+let b:cb_jump_on_close = 0
 
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
@@ -42,24 +87,21 @@ let g:syntastic_check_on_wq = 0
 " Terraform settings
 let g:syntastic_terraform_tffilter_plan = 1
 let g:terraform_completion_keys = 1
-let g:terraform_registry_module_completion = 0
+let g:terraform_registry_module_completion = 2
+let g:terraform_fold_sections=1
+let g:terraform_align=1
+let g:terraform_fmt_on_save=1
 
-" deoplete config
-let g:deoplete#enable_at_startup = 1
-
-" Use Vim settings, rather than Vi settings (much better!).
-set nocompatible
-
-" Disable the splash screen
-set shortmess +=I
-set hidden
+set completeopt-=preview
+set shortmess +=I                " Disable splash screen
+set hidden                       " enable hidden buffer control
 set noai                         " set auto-indenting on for programming
 set showcmd                      " display incomplete commnds
 set list                         " show invisibles
 set number                       " show line numbers
 set ruler                        " show the current row and column
-set hlsearch
-set cursorline
+set hlsearch                     " highlight search patterns
+set cursorline                   " highlight current line
 
 set listchars=tab:▸\ ,eol:¬
 
@@ -77,9 +119,11 @@ set autoread
 
 setlocal autoindent
 setlocal smartindent
+
 set visualbell t_vb=             " turn off error beep/flash
 set novisualbell                 " turn off visual bell
 set pastetoggle=<F2>             " toggle 'set paste'
+
 " fast terminal for smoother rendering
 set ttyfast
 " turn off swap files
@@ -94,28 +138,38 @@ set backspace=indent,eol,start
 
 " Switch syntax highlighting on
 syntax on
-set tags=$HOME/.vim.tags
-helptags $HOME/.vim.tags
-
+set tags=$HOME/.vim/tags
+helptags $HOME/.vim/tags
 
 color blackboard
 set colorcolumn=120
 
 highlight Pmenu ctermbg=gray guibg=gray
 
+" deoplete config
+" let g:deoplete#enable_at_startup = 1
+" let g:deoplete#omni_patterns = {}
+"
+" call deoplete#custom#option('auto_complete', v:false)
+" call deoplete#custom#option('omni_patterns', {
+" \ 'complete_method': 'omnifunc',
+" \ 'terraform': '[^ *\t"{=$]\w*',
+" \})
+" call deoplete#initialize()
+
 " Load a tag file
-" Loads a tag file from ~/.vim.tags/, based on the argument provided. The
-" command "Ltag"" is mapped to this function.
+" Loads a tag file from ~/.vim/tags/, based on the argument provided. The
+" command Ltag is mapped to this function.
 function! LoadTags(file)
-   let tagspath = $HOME . "/.vim.tags/" . a:file
+   let tagspath = $HOME . "/.vim/tags/" . a:file
    let tagcommand = 'set tags+=' . tagspath
    execute tagcommand
 endfunction
 command! -nargs=1 Ltag :call LoadTags("<args>")
 
+
 " Enable file type detection and do language-dependent indenting.
 filetype plugin indent on
-
 set mouse=a
 " Shortcut to rapidly toggle `set list`
 nmap <leader>l :set list!<CR>
@@ -129,7 +183,7 @@ function! Stab()
     let &l:sts = l:tabstop
     let &l:ts = l:tabstop
     let &l:sw = l:tabstop
-  endif
+endif
   call SummarizeTabs()
 endfunction
 
@@ -149,8 +203,6 @@ function! SummarizeTabs()
   endtry
 endfunction
 
-let tagspath = "~/.vim.tags/"
-
 " set the names of flags
 " close all folds except for current file
 let Tlist_File_Fold_Auto_Close = 1
@@ -164,8 +216,6 @@ let Tlist_Close_On_Select = 1
 let Tlist_Display_Prototype = 1
 " show tags only for current buffer
 let Tlist_Show_One_File = 1
-" call pathogen#infect()
-"}}}
 "
 "{{{html options
 let html_use_css = 1
@@ -211,12 +261,16 @@ imap <silent> <Up> <C-o>gk
 nmap <silent> <Down> gj
 nmap <silent> <Up> gk
 
+inoremap <expr> <Up>   pumvisible() ? "\<C-P>" : "\<Up>"
+inoremap <expr> <Down> pumvisible() ? "\<C-N>" : "\<Down>"
+
+autocmd CompleteDone * pclose
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+
 noremap <F3> :call Svndiff("prev")<CR>
 noremap <F4> :call Svndiff("next")<CR>
-noremap <F5> :call Svndiff("clear")<CR>
-
-autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
-autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+noremap <F8> :call Svndiff("clear")<CR>
+noremap <silent> <F9> :call VimCommanderToggle()<CR>
 
 autocmd BufWritePre * :%s/\s\+$//e
 
@@ -228,8 +282,6 @@ augroup END
 
 call tabline#setup()
 call bookcommands#setup()
-
-noremap <silent> <F9> :cal VimCommanderToggle()<CR>
 
 let NERDTreeIgnore = ['\.pyc$']
 

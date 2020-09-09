@@ -24,7 +24,7 @@ command! NoBook execute NoBook()
 
 function CompileTex()
 
-endfunction()
+endfunction
 
 function PreviewTex()
 
